@@ -99,8 +99,10 @@ public class GraphQLDataFetchers {
                 document.append("permissions", environment.getArgument("permissions"));
                 String hashedPwd = SecurityUtils.hash(environment.getArgument("password").toString().toCharArray());
                 document.append("password", hashedPwd);
-                document.append("token", SecurityUtils.generateToken());
+                String token = SecurityUtils.generateToken();
+                document.append("token", token);
 
+                TruckersPortal.mongoUtils.insertDocument("tokens", new Document("token", token));
                 TruckersPortal.mongoUtils.insertDocument("users", document);
                 return document;
             }
@@ -176,6 +178,7 @@ public class GraphQLDataFetchers {
                 newData.append("state", environment.getArgument("state"));
                 newData.append("zipCode", environment.getArgument("zipCode"));
                 newData.append("factoring", environment.getArgument("factoring"));
+                newData.append("factoringName", environment.getArgument("factoringName"));
                 newData.append("factoringStreet", environment.getArgument("factoringStreet"));
                 newData.append("factoringCity", environment.getArgument("factoringCity"));
                 newData.append("factoringState", environment.getArgument("factoringState"));

@@ -13,10 +13,10 @@ type Mutation {
     addUser(token: String, firstName: String, lastName: String, email: String, phoneNumber: String, permissions: [String], password: String): User
     addDriverLoad(token: String, id: String, loadId: String): Driver
     changeDriverStatus(token: String, id: String, status: String): Driver
-    authenticateUser(token: String, email: String,password: String): User
+    authenticateUser(token: String, email: String, password: String): User
     addToken(token: String, newToken: String): Token
     authenticateToken(token: String): Token
-    updateCarrier(token: String, name: String, email: String, number: String, street: String, city: String, state: String, zipCode: String, factoring: Boolean, factoringStreet: String, factoringCity: String, factoringState: String, factoringZip: String): Carrier
+    updateCarrier(token: String, name: String, email: String, number: String, street: String, city: String, state: String, zipCode: String, factoring: Boolean, factoringName: String, factoringStreet: String, factoringCity: String, factoringState: String, factoringZip: String): Carrier
 }
 
 type Carrier {
@@ -28,6 +28,7 @@ type Carrier {
     state: String
     zipCode: String
     factoring: Boolean
+    factoringName: String
     factoringStreet: String
     factoringCity: String
     factoringState: String
