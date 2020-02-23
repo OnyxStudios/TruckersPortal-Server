@@ -5,10 +5,15 @@ type Query {
     getLoads(token: String): [Load]
     getUsers(token: String): [User]
     getDrivers(token: String): [Driver]
+
+    getTotalRevenue(token: String): Revenue
+    getUnpaidLoads(token: String): Revenue
+    getCurrentLoads(token: String): LoadsCount
+    getCompletedLoads(token: String): LoadsCount
 }
 
 type Mutation {
-    addLoad(token: String, loadNumber: String, rate: Float, detention: Float, driverId: String, status: String): Load
+    addLoad(token: String, loadNumber: String, rate: Float, detention: Float, driverId: String, status: String, paid: Boolean): Load
     addDriver(token: String, name: String, payCut: Float, phoneNumber: String): Driver
     addUser(token: String, firstName: String, lastName: String, email: String, phoneNumber: String, permissions: [String], password: String): User
     addDriverLoad(token: String, id: String, loadId: String): Driver
@@ -35,6 +40,14 @@ type Carrier {
     factoringZip: String
 }
 
+type Revenue {
+    revenue: Float
+}
+
+type LoadsCount {
+    loads: Int
+}
+
 type Token {
     token: String
 }
@@ -46,6 +59,7 @@ type Load {
     detention: Float
     driverId: String
     status: String
+    paid: Boolean
 }
 
 type Driver {

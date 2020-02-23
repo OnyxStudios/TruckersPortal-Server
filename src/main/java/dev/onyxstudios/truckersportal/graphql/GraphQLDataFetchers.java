@@ -1,12 +1,14 @@
 package dev.onyxstudios.truckersportal.graphql;
 
 import com.google.common.collect.Lists;
+import com.mongodb.client.MongoCursor;
 import graphql.schema.DataFetcher;
 import dev.onyxstudios.truckersportal.TruckersPortal;
 import dev.onyxstudios.truckersportal.utils.SecurityUtils;
 import org.bson.Document;
 import org.springframework.stereotype.Component;
 
+import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,6 +61,7 @@ public class GraphQLDataFetchers {
                 document.append("detention", environment.getArgument("detention"));
                 document.append("driverId", environment.getArgument("driverId"));
                 document.append("status", environment.getArgument("status"));
+                document.append("paid", environment.getArgument("paid"));
 
                 TruckersPortal.mongoUtils.insertDocument("loads", document);
                 return document;
@@ -217,6 +220,74 @@ public class GraphQLDataFetchers {
         return environment -> {
             if(authenticateToken(environment.getArgument("token")) != null) {
                 return Lists.newArrayList(TruckersPortal.mongoUtils.getTableData("users"));
+            }
+
+            return null;
+        };
+    }
+
+    public DataFetcher getTotalRevenue() {
+        return environment -> {
+            if(authenticateToken(environment.getArgument("token")) != null) {
+                float revenue = 0;
+                for (MongoCursor<Document> it = TruckersPortal.mongoUtils.getTableData("loads"); it.hasNext(); ) {
+                    Document load = it.next();
+                    if (load.getBoolean("paid"))
+                        revenue += load.getDouble("rate") + load.getDouble("detention");
+                }
+
+                return new Document("revenue", revenue);
+            }
+
+            return null;
+        };
+    }
+
+    public DataFetcher getUnpaidLoads() {
+        return environment -> {
+            if(authenticateToken(environment.getArgument("token")) != null) {
+                float unpaidRevenue = 0;
+                for (MongoCursor<Document> it = TruckersPortal.mongoUtils.getTableData("loads"); it.hasNext(); ) {
+                    Document load = it.next();
+                    if (!load.getBoolean("paid"))
+                        unpaidRevenue += load.getDouble("rate") + load.getDouble("detention");
+                }
+
+                return new Document("revenue", unpaidRevenue);
+            }
+
+            return null;
+        };
+    }
+
+    public DataFetcher getCurrentLoads() {
+        return environment -> {
+            if(authenticateToken(environment.getArgument("token")) != null) {
+                int currentLoads = 0;
+                for (MongoCursor<Document> it = TruckersPortal.mongoUtils.getTableData("loads"); it.hasNext(); ) {
+                    Document load = it.next();
+                    if (!load.getString("status").equalsIgnoreCase("Complete"))
+                        currentLoads++;
+                }
+
+                return new Document("loads", currentLoads);
+            }
+
+            return null;
+        };
+    }
+
+    public DataFetcher getCompletedLoads() {
+        return environment -> {
+            if(authenticateToken(environment.getArgument("token")) != null) {
+                int completedLoads = 0;
+                for (MongoCursor<Document> it = TruckersPortal.mongoUtils.getTableData("loads"); it.hasNext(); ) {
+                    Document load = it.next();
+                    if (load.getString("status").equalsIgnoreCase("Complete"))
+                        completedLoads++;
+                }
+
+                return new Document("loads", completedLoads);
             }
 
             return null;

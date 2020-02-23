@@ -61,6 +61,10 @@ public class GraphQLProvider {
                         .dataFetcher("addToken", graphQLDataFetchers.addTokenFetcher())
                         .dataFetcher("authenticateToken", graphQLDataFetchers.authenticateTokenFetcher())
                         .dataFetcher("updateCarrier", graphQLDataFetchers.updateCarrierFetcher())
+                        .dataFetcher("getTotalRevenue", graphQLDataFetchers.getTotalRevenue())
+                        .dataFetcher("getUnpaidLoads", graphQLDataFetchers.getUnpaidLoads())
+                        .dataFetcher("getCurrentLoads", graphQLDataFetchers.getCurrentLoads())
+                        .dataFetcher("getCompletedLoads", graphQLDataFetchers.getCompletedLoads())
                 ).build();
     }
 }
