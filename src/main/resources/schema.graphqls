@@ -1,0 +1,68 @@
+type Query {
+    loadById(token: String, id: String): Load
+    driverById(token: String, id: String): Driver
+    userById(token: String, id: String): User
+    getLoads(token: String): [Load]
+    getUsers(token: String): [User]
+    getDrivers(token: String): [Driver]
+}
+
+type Mutation {
+    addLoad(token: String, loadNumber: String, rate: Float, detention: Float, driverId: String, status: String): Load
+    addDriver(token: String, name: String, payCut: Float, phoneNumber: String): Driver
+    addUser(token: String, firstName: String, lastName: String, email: String, phoneNumber: String, permissions: [String], password: String): User
+    addDriverLoad(token: String, id: String, loadId: String): Driver
+    changeDriverStatus(token: String, id: String, status: String): Driver
+    authenticateUser(token: String, email: String,password: String): User
+    addToken(token: String, newToken: String): Token
+    authenticateToken(token: String): Token
+    updateCarrier(token: String, name: String, email: String, number: String, street: String, city: String, state: String, zipCode: String, factoring: Boolean, factoringStreet: String, factoringCity: String, factoringState: String, factoringZip: String): Carrier
+}
+
+type Carrier {
+    name: String
+    email: String
+    phoneNumber: String
+    street: String
+    city: String
+    state: String
+    zipCode: String
+    factoring: Boolean
+    factoringStreet: String
+    factoringCity: String
+    factoringState: String
+    factoringZip: String
+}
+
+type Token {
+    token: String
+}
+
+type Load {
+    id: String
+    loadNumber: String
+    rate: Float
+    detention: Float
+    driverId: String
+    status: String
+}
+
+type Driver {
+    id: String
+    name: String
+    payCut: Float
+    loadsComplete: [Load]
+    phoneNumber: String
+    status: String
+}
+
+type User {
+    id: String
+    firstName: String
+    lastName: String
+    email: String
+    phoneNumber: String
+    permissions: [String],
+    password: String,
+    token: String
+}
