@@ -19,6 +19,7 @@ dependencies {
     implementation 'com.google.guava:guava:26.0-jre'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-configuration-processor'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     compile group: 'org.mongodb', name: 'mongo-java-driver', version: '3.12.1'
 }

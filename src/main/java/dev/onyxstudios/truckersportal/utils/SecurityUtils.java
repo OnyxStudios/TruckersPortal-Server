@@ -63,18 +63,22 @@ public class SecurityUtils {
     }
 
     public static boolean authenticate(char[] password, String token) {
-        Matcher matcher = layout.matcher(token);
-        if (!matcher.matches())
-            throw new IllegalArgumentException("Invalid token format");
-        int iterations = iterations(Integer.parseInt(matcher.group(1)));
-        byte[] hash = Base64.getUrlDecoder().decode(matcher.group(2));
-        byte[] salt = Arrays.copyOfRange(hash, 0, SIZE / 8);
-        byte[] check = pbkdf2(password, salt, iterations);
-        int zero = 0;
-        for (int idx = 0; idx < check.length; ++idx)
-            zero |= hash[salt.length + idx] ^ check[idx];
+        if(password != null && token != null) {
+            Matcher matcher = layout.matcher(token);
+            if (!matcher.matches())
+                throw new IllegalArgumentException("Invalid token format");
+            int iterations = iterations(Integer.parseInt(matcher.group(1)));
+            byte[] hash = Base64.getUrlDecoder().decode(matcher.group(2));
+            byte[] salt = Arrays.copyOfRange(hash, 0, SIZE / 8);
+            byte[] check = pbkdf2(password, salt, iterations);
+            int zero = 0;
+            for (int idx = 0; idx < check.length; ++idx)
+                zero |= hash[salt.length + idx] ^ check[idx];
 
-        return zero == 0;
+            return zero == 0;
+        }
+
+        return false;
     }
 
     public static int iterations(int cost) {

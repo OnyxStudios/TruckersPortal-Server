@@ -8,7 +8,6 @@ import dev.onyxstudios.truckersportal.utils.SecurityUtils;
 import org.bson.Document;
 import org.springframework.stereotype.Component;
 
-import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.List;
 
