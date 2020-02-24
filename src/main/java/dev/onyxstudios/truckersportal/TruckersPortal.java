@@ -11,7 +11,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 
 import java.io.*;
-import java.net.URISyntaxException;
 
 @SpringBootApplication
 @EnableConfigurationProperties(StorageProperties.class)
@@ -24,16 +23,13 @@ public class TruckersPortal {
     public static void main(String[] args) {
 
         try {
-            File file = new File(TruckersPortal.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath() + "/keystore_pass.txt");
-
+            File file = new File("keystore_pass.txt");
             if(file.exists()) {
                 BufferedReader reader = new BufferedReader(new FileReader(file));
                 URL = reader.readLine();
                 reader.close();
             }
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (URISyntaxException e) {
             e.printStackTrace();
         }
 
