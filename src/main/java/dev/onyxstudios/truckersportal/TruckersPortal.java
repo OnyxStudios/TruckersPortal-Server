@@ -11,31 +11,29 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 @SpringBootApplication
 @EnableConfigurationProperties(StorageProperties.class)
 public class TruckersPortal {
 
+    public static String PASS_FILE = "/keystore_pass.txt";
     public static String URL;
     public static MongoUtils mongoUtils;
     public static String[] COLLECTIONS = new String[]{"loads", "drivers", "users", "tokens", "carrier"};
 
-    public static void main(String[] args) {
-
-        try {
-            File file = new File("keystore_pass.txt");
-            if(file.exists()) {
-                BufferedReader reader = new BufferedReader(new FileReader(file));
-                URL = reader.readLine();
-                reader.close();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+    public static void main(String[] args) throws IOException {
+        if (Files.exists(Paths.get(PASS_FILE))) {
+            URL = Files.readAllLines(Paths.get(PASS_FILE), StandardCharsets.UTF_8).get(0);
+        } else {
+            throw new FileNotFoundException("Could not find keystore_pass.txt!");
         }
 
         mongoUtils = new MongoUtils(URL, "truckersportal");
         for (String collection : COLLECTIONS) {
-            if(!mongoUtils.collectionExists(collection))
+            if (!mongoUtils.collectionExists(collection))
                 mongoUtils.createMongoCollection(collection);
         }
 
