@@ -13,7 +13,7 @@ type Query {
 }
 
 type Mutation {
-    addLoad(token: String, loadNumber: String, rate: Float, detention: Float, driverId: String, status: String, paid: Boolean): Load
+    addLoad(token: String, brokerName: String, loadNumber: String, rate: Float, detention: Float, driverId: String, status: String, paid: Boolean): Load
     addDriver(token: String, name: String, payCut: Float, phoneNumber: String): Driver
     addUser(token: String, firstName: String, lastName: String, email: String, phoneNumber: String, permissions: [String], password: String): User
     addDriverLoad(token: String, id: String, loadId: String): Driver
@@ -54,6 +54,7 @@ type Token {
 
 type Load {
     id: String
+    brokerName: String
     loadNumber: String
     rate: Float
     detention: Float

@@ -50,6 +50,10 @@ public class GraphQLProvider {
                         .dataFetcher("getLoads", graphQLDataFetchers.getLoadsFetcher())
                         .dataFetcher("getUsers", graphQLDataFetchers.getUsersFetcher())
                         .dataFetcher("getDrivers", graphQLDataFetchers.getDriversFetcher())
+                        .dataFetcher("getTotalRevenue", graphQLDataFetchers.getTotalRevenue())
+                        .dataFetcher("getUnpaidLoads", graphQLDataFetchers.getUnpaidLoads())
+                        .dataFetcher("getCurrentLoads", graphQLDataFetchers.getCurrentLoads())
+                        .dataFetcher("getCompletedLoads", graphQLDataFetchers.getCompletedLoads())
                 )
                 .type(TypeRuntimeWiring.newTypeWiring("Mutation")
                         .dataFetcher("addLoad", graphQLDataFetchers.addLoadFetcher())
@@ -61,10 +65,6 @@ public class GraphQLProvider {
                         .dataFetcher("addToken", graphQLDataFetchers.addTokenFetcher())
                         .dataFetcher("authenticateToken", graphQLDataFetchers.authenticateTokenFetcher())
                         .dataFetcher("updateCarrier", graphQLDataFetchers.updateCarrierFetcher())
-                        .dataFetcher("getTotalRevenue", graphQLDataFetchers.getTotalRevenue())
-                        .dataFetcher("getUnpaidLoads", graphQLDataFetchers.getUnpaidLoads())
-                        .dataFetcher("getCurrentLoads", graphQLDataFetchers.getCurrentLoads())
-                        .dataFetcher("getCompletedLoads", graphQLDataFetchers.getCompletedLoads())
                 ).build();
     }
 }

@@ -55,6 +55,7 @@ public class GraphQLDataFetchers {
             if(authenticateToken(environment.getArgument("token")) != null) {
                 Document document = new Document();
                 document.append("id", "load-" + Math.floor(100000 + Math.random() * 900000));
+                document.append("brokerName", environment.getArgument("brokerName"));
                 document.append("loadNumber", environment.getArgument("loadNumber"));
                 document.append("rate", environment.getArgument("rate"));
                 document.append("detention", environment.getArgument("detention"));
@@ -229,8 +230,9 @@ public class GraphQLDataFetchers {
         return environment -> {
             if(authenticateToken(environment.getArgument("token")) != null) {
                 float revenue = 0;
-                for (MongoCursor<Document> it = TruckersPortal.mongoUtils.getTableData("loads"); it.hasNext(); ) {
-                    Document load = it.next();
+                MongoCursor<Document> cursor = TruckersPortal.mongoUtils.getTableData("loads");
+                while (cursor.hasNext()) {
+                    Document load = cursor.next();
                     if (load.getBoolean("paid"))
                         revenue += load.getDouble("rate") + load.getDouble("detention");
                 }
@@ -238,7 +240,7 @@ public class GraphQLDataFetchers {
                 return new Document("revenue", revenue);
             }
 
-            return null;
+            return new Document("revenue", 0);
         };
     }
 
@@ -246,8 +248,9 @@ public class GraphQLDataFetchers {
         return environment -> {
             if(authenticateToken(environment.getArgument("token")) != null) {
                 float unpaidRevenue = 0;
-                for (MongoCursor<Document> it = TruckersPortal.mongoUtils.getTableData("loads"); it.hasNext(); ) {
-                    Document load = it.next();
+                MongoCursor<Document> cursor = TruckersPortal.mongoUtils.getTableData("loads");
+                while (cursor.hasNext()) {
+                    Document load = cursor.next();
                     if (!load.getBoolean("paid"))
                         unpaidRevenue += load.getDouble("rate") + load.getDouble("detention");
                 }
@@ -255,7 +258,7 @@ public class GraphQLDataFetchers {
                 return new Document("revenue", unpaidRevenue);
             }
 
-            return null;
+            return new Document("revenue", 0);
         };
     }
 
@@ -263,8 +266,9 @@ public class GraphQLDataFetchers {
         return environment -> {
             if(authenticateToken(environment.getArgument("token")) != null) {
                 int currentLoads = 0;
-                for (MongoCursor<Document> it = TruckersPortal.mongoUtils.getTableData("loads"); it.hasNext(); ) {
-                    Document load = it.next();
+                MongoCursor<Document> cursor = TruckersPortal.mongoUtils.getTableData("loads");
+                while (cursor.hasNext()) {
+                    Document load = cursor.next();
                     if (!load.getString("status").equalsIgnoreCase("Complete"))
                         currentLoads++;
                 }
@@ -272,7 +276,7 @@ public class GraphQLDataFetchers {
                 return new Document("loads", currentLoads);
             }
 
-            return null;
+            return new Document("loads", 0);
         };
     }
 
@@ -280,8 +284,9 @@ public class GraphQLDataFetchers {
         return environment -> {
             if(authenticateToken(environment.getArgument("token")) != null) {
                 int completedLoads = 0;
-                for (MongoCursor<Document> it = TruckersPortal.mongoUtils.getTableData("loads"); it.hasNext(); ) {
-                    Document load = it.next();
+                MongoCursor<Document> cursor = TruckersPortal.mongoUtils.getTableData("loads");
+                while (cursor.hasNext()) {
+                    Document load = cursor.next();
                     if (load.getString("status").equalsIgnoreCase("Complete"))
                         completedLoads++;
                 }
@@ -289,7 +294,7 @@ public class GraphQLDataFetchers {
                 return new Document("loads", completedLoads);
             }
 
-            return null;
+            return new Document("loads", 0);
         };
     }
 
