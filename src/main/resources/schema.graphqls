@@ -67,7 +67,7 @@ type Driver {
     id: String
     name: String
     payCut: Float
-    loadsComplete: [Load]
+    loadsComplete: [String]
     phoneNumber: String
     status: String
 }
