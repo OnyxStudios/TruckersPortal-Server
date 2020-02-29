@@ -59,7 +59,6 @@ public class GraphQLProvider {
                         .dataFetcher("addLoad", graphQLDataFetchers.addLoadFetcher())
                         .dataFetcher("addDriver", graphQLDataFetchers.addDriverFetcher())
                         .dataFetcher("addUser", graphQLDataFetchers.addUserFetcher())
-                        .dataFetcher("addDriverLoad", graphQLDataFetchers.addDriverLoadFetcher())
                         .dataFetcher("changeDriverStatus", graphQLDataFetchers.changeDriverStatus())
                         .dataFetcher("authenticateUser", graphQLDataFetchers.authenticateUserFetcher())
                         .dataFetcher("addToken", graphQLDataFetchers.addTokenFetcher())

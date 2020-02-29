@@ -17,9 +17,7 @@ public class GraphQLDataFetchers {
     public DataFetcher getLoadByIdFetcher() {
         return environment -> {
             if(authenticateToken(environment.getArgument("token")) != null) {
-                String id = environment.getArgument("id");
-                Document filter = new Document("id", id);
-                return TruckersPortal.mongoUtils.getDocument("loads", filter);
+                return TruckersPortal.mongoUtils.getDocument("loads", new Document("id", environment.getArgument("id")));
             }
 
             return null;
@@ -30,8 +28,10 @@ public class GraphQLDataFetchers {
         return environment -> {
             if(authenticateToken(environment.getArgument("token")) != null) {
                 String id = environment.getArgument("id");
-                Document filter = new Document("id", id);
-                return TruckersPortal.mongoUtils.getDocument("drivers", filter);
+                Document driver = TruckersPortal.mongoUtils.getDocument("drivers", new Document("id", id));
+                driver.append("earnings", getDriverEarnings(driver.getList("loadsComplete", String.class), driver.getDouble("payCut")));
+
+                return driver;
             }
 
             return null;
@@ -41,9 +41,7 @@ public class GraphQLDataFetchers {
     public DataFetcher getUserByIdFetcher() {
         return environment -> {
             if(authenticateToken(environment.getArgument("token")) != null) {
-                String id = environment.getArgument("id");
-                Document filter = new Document("id", id);
-                return TruckersPortal.mongoUtils.getDocument("users", filter);
+                return TruckersPortal.mongoUtils.getDocument("users", new Document("id", environment.getArgument("id")));
             }
 
             return null;
@@ -53,16 +51,20 @@ public class GraphQLDataFetchers {
     public DataFetcher addLoadFetcher() {
         return environment -> {
             if(authenticateToken(environment.getArgument("token")) != null) {
+                String loadId = "load-" + (int) Math.floor(100000 + Math.random() * 900000);
+                String driverId = environment.getArgument("driverId");
+
                 Document document = new Document();
-                document.append("id", "load-" + Math.floor(100000 + Math.random() * 900000));
+                document.append("id", loadId);
                 document.append("brokerName", environment.getArgument("brokerName"));
                 document.append("loadNumber", environment.getArgument("loadNumber"));
                 document.append("rate", environment.getArgument("rate"));
                 document.append("detention", environment.getArgument("detention"));
-                document.append("driverId", environment.getArgument("driverId"));
+                document.append("driverId", driverId);
                 document.append("status", environment.getArgument("status"));
                 document.append("paid", environment.getArgument("paid"));
 
+                addLoadToDriver(driverId, loadId);
                 TruckersPortal.mongoUtils.insertDocument("loads", document);
                 return document;
             }
@@ -121,24 +123,6 @@ public class GraphQLDataFetchers {
                 Document currentData = TruckersPortal.mongoUtils.getDocument("drivers", new Document("id", driverId));
                 Document newData = new Document(currentData);
                 newData.append("status", environment.getArgument("status"));
-
-                TruckersPortal.mongoUtils.updateDocument("drivers", currentData, newData);
-                return newData;
-            }
-
-            return null;
-        };
-    }
-
-    public DataFetcher addDriverLoadFetcher() {
-        return environment -> {
-            if(authenticateToken(environment.getArgument("token")) != null) {
-                String driverId = environment.getArgument("id");
-                Document currentData = TruckersPortal.mongoUtils.getDocument("drivers", new Document("id", driverId));
-                List<String> loads = currentData.getList("loadsComplete", String.class);
-                loads.add(environment.getArgument("loadId"));
-                Document newData = new Document(currentData);
-                newData.put("loadsComplete", loads);
 
                 TruckersPortal.mongoUtils.updateDocument("drivers", currentData, newData);
                 return newData;
@@ -209,10 +193,18 @@ public class GraphQLDataFetchers {
     public DataFetcher getDriversFetcher() {
         return environment -> {
             if(authenticateToken(environment.getArgument("token")) != null) {
-                return Lists.newArrayList(TruckersPortal.mongoUtils.getTableData("drivers"));
+                List<Document> drivers = new ArrayList<>();
+                MongoCursor<Document> cursor = TruckersPortal.mongoUtils.getTableData("drivers");
+                while (cursor.hasNext()) {
+                    Document driver = cursor.next();
+                    driver.append("earnings", getDriverEarnings(driver.getList("loadsComplete", String.class), driver.getDouble("payCut")));
+                    drivers.add(driver);
+                }
+
+                return drivers;
             }
 
-            return null;
+            return new ArrayList<>();
         };
     }
 
@@ -304,5 +296,26 @@ public class GraphQLDataFetchers {
 
     public Document authenticateToken(String token) {
         return TruckersPortal.mongoUtils.getDocument("tokens", new Document("token", token));
+    }
+
+    public float getDriverEarnings(List<String> loads, double rawPayCut) {
+        float earnings = 0;
+        double payCut = 1 - (rawPayCut / 100);
+        for (String loadId : loads) {
+            Document load = TruckersPortal.mongoUtils.getDocument("loads", new Document("id", loadId));
+            earnings += (load.getDouble("rate") + load.getDouble("detention")) * payCut;
+        }
+
+        return earnings;
+    }
+
+    public void addLoadToDriver(String driverId, String loadId) {
+        Document driverData = TruckersPortal.mongoUtils.getDocument("drivers", new Document("id", driverId));
+        Document newDriverData = new Document(driverData);
+        List<String> loads = driverData.getList("loadsComplete", String.class);
+        loads.add(loadId);
+        newDriverData.put("loadsComplete", loads);
+
+        TruckersPortal.mongoUtils.updateDocument("drivers", driverData, newDriverData);
     }
 }
