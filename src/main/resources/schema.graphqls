@@ -10,12 +10,13 @@ type Query {
     getUnpaidLoads(token: String): Revenue
     getCurrentLoads(token: String): LoadsCount
     getCompletedLoads(token: String): LoadsCount
+    getCarrierProfile(token: String): Carrier
 }
 
 type Mutation {
     addLoad(token: String, brokerName: String, loadNumber: String, rate: Float, detention: Float, driverId: String, status: String, paid: Boolean): Load
     addDriver(token: String, name: String, payCut: Float, phoneNumber: String): Driver
-    addUser(token: String, firstName: String, lastName: String, email: String, phoneNumber: String, permissions: [String], password: String): User
+    addUser(token: String, firstName: String, lastName: String, email: String, phoneNumber: String, permissions: [String]): User
     changeDriverStatus(token: String, id: String, status: String): Driver
     authenticateUser(token: String, email: String, password: String): User
     addToken(token: String, newToken: String): Token

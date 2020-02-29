@@ -2,6 +2,7 @@ package dev.onyxstudios.truckersportal.graphql;
 
 import com.google.common.collect.Lists;
 import com.mongodb.client.MongoCursor;
+import dev.onyxstudios.truckersportal.utils.EmailUtils;
 import graphql.schema.DataFetcher;
 import dev.onyxstudios.truckersportal.TruckersPortal;
 import dev.onyxstudios.truckersportal.utils.SecurityUtils;
@@ -96,20 +97,24 @@ public class GraphQLDataFetchers {
     public DataFetcher addUserFetcher() {
         return environment -> {
             if(authenticateToken(environment.getArgument("token")) != null) {
+                String randomPassword = SecurityUtils.generateToken();
+                String email = environment.getArgument("email");
+                String firstName = environment.getArgument("firstName");
+
                 Document document = new Document();
                 document.append("id", "user-" + (int) Math.floor(100000 + Math.random() * 900000));
-                document.append("firstName", environment.getArgument("firstName"));
+                document.append("firstName", firstName);
                 document.append("lastName", environment.getArgument("lastName"));
-                document.append("email", environment.getArgument("email"));
+                document.append("email", email);
                 document.append("phoneNumber", environment.getArgument("phoneNumber"));
                 document.append("permissions", environment.getArgument("permissions"));
-                String hashedPwd = SecurityUtils.hash(environment.getArgument("password").toString().toCharArray());
-                document.append("password", hashedPwd);
+                document.append("password", SecurityUtils.hash(randomPassword.toCharArray()));
                 String token = SecurityUtils.generateToken();
-                document.append("token", token);
+                document.append("token", SecurityUtils.generateToken());
 
                 TruckersPortal.mongoUtils.insertDocument("tokens", new Document("token", token));
                 TruckersPortal.mongoUtils.insertDocument("users", document);
+                EmailUtils.sendRegistrationEmail(email, firstName, randomPassword);
                 return document;
             }
 
@@ -156,26 +161,32 @@ public class GraphQLDataFetchers {
     public DataFetcher updateCarrierFetcher() {
         return environment -> {
             if(authenticateToken(environment.getArgument("token")) != null) {
-                Document currentData = TruckersPortal.mongoUtils.getFirstDocument("carrier");
-                Document newData = new Document();
-                newData.append("name", environment.getArgument("name"));
-                newData.append("email", environment.getArgument("email"));
-                newData.append("phoneNumber", environment.getArgument("number"));
-                newData.append("street", environment.getArgument("street"));
-                newData.append("city", environment.getArgument("city"));
-                newData.append("state", environment.getArgument("state"));
-                newData.append("zipCode", environment.getArgument("zipCode"));
-                newData.append("factoring", environment.getArgument("factoring"));
-                newData.append("factoringName", environment.getArgument("factoringName"));
-                newData.append("factoringStreet", environment.getArgument("factoringStreet"));
-                newData.append("factoringCity", environment.getArgument("factoringCity"));
-                newData.append("factoringState", environment.getArgument("factoringState"));
-                newData.append("factoringZip", environment.getArgument("factoringZip"));
+                TruckersPortal.carrierProfile.name = environment.getArgument("name");
+                TruckersPortal.carrierProfile.email = environment.getArgument("email");
+                TruckersPortal.carrierProfile.phoneNumber = environment.getArgument("number");
+                TruckersPortal.carrierProfile.street = environment.getArgument("street");
+                TruckersPortal.carrierProfile.city = environment.getArgument("city");
+                TruckersPortal.carrierProfile.state = environment.getArgument("state");
+                TruckersPortal.carrierProfile.zipCode = environment.getArgument("zipCode");
+                TruckersPortal.carrierProfile.factoring = environment.getArgument("factoring");
+                TruckersPortal.carrierProfile.factoringProfile.name = environment.getArgument("factoringName");
+                TruckersPortal.carrierProfile.factoringProfile.street = environment.getArgument("factoringStreet");
+                TruckersPortal.carrierProfile.factoringProfile.city = environment.getArgument("factoringCity");
+                TruckersPortal.carrierProfile.factoringProfile.state = environment.getArgument("factoringState");
+                TruckersPortal.carrierProfile.factoringProfile.zipCode = environment.getArgument("factoringZip");
 
-                TruckersPortal.mongoUtils.updateDocument("carrier", currentData, newData);
-                return newData;
+                return TruckersPortal.carrierProfile.toDocument();
             }
 
+            return null;
+        };
+    }
+
+    public DataFetcher getCarrierProfile() {
+        return environment -> {
+            if(authenticateToken(environment.getArgument("token")) != null) {
+                return TruckersPortal.carrierProfile.toDocument();
+            }
 
             return null;
         };

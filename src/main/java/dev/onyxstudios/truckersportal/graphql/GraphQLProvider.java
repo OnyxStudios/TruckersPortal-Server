@@ -54,6 +54,7 @@ public class GraphQLProvider {
                         .dataFetcher("getUnpaidLoads", graphQLDataFetchers.getUnpaidLoads())
                         .dataFetcher("getCurrentLoads", graphQLDataFetchers.getCurrentLoads())
                         .dataFetcher("getCompletedLoads", graphQLDataFetchers.getCompletedLoads())
+                        .dataFetcher("getCarrierProfile", graphQLDataFetchers.getCarrierProfile())
                 )
                 .type(TypeRuntimeWiring.newTypeWiring("Mutation")
                         .dataFetcher("addLoad", graphQLDataFetchers.addLoadFetcher())
