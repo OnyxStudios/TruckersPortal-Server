@@ -55,7 +55,7 @@ public class CarrierProfile {
         TruckersPortal.CONFIG.set("state", this.state);
         TruckersPortal.CONFIG.set("zipCode", this.zipCode);
         TruckersPortal.CONFIG.set("domain", this.domain);
-        TruckersPortal.CONFIG.set("factoring", this.factoringProfile);
+        TruckersPortal.CONFIG.set("factoring", this.factoring);
 
         TruckersPortal.CONFIG.set("factoring-name", this.factoringProfile.name);
         TruckersPortal.CONFIG.set("factoring-street", this.factoringProfile.street);

@@ -1,5 +1,6 @@
 package dev.onyxstudios.truckersportal.fileupload;
 
+import com.google.common.io.Files;
 import dev.onyxstudios.truckersportal.fileupload.storage.StorageFileNotFoundException;
 import dev.onyxstudios.truckersportal.fileupload.storage.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,6 @@ public class FileUploadController {
         model.addAttribute("files", storageService.loadAll().map(path ->
                 MvcUriComponentsBuilder.fromMethodName(FileUploadController.class, "serveFile", path.getFileName().toString()).build().toUri().toString()).collect(Collectors.toList()));
 
-
         return "uploadForm";
     }
 
@@ -38,6 +38,14 @@ public class FileUploadController {
     @ResponseBody
     public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
         Resource file = storageService.loadAsResource(filename);
+        String extension = Files.getFileExtension(filename);
+
+        if (extension.contains("png") || extension.contains("jpg") || extension.contains("jpeg")) {
+            return ResponseEntity.ok().header("content-type", "image/png").body(file);
+        }else if(extension.contains("pdf")) {
+            return ResponseEntity.ok().header("content-type", "application/pdf").body(file);
+        }
+
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"").body(file);
     }
 
