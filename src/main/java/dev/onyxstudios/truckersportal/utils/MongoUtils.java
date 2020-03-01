@@ -58,7 +58,7 @@ public class MongoUtils {
      * @param updated - The new data we wish to override the original data with
      */
     public void updateDocument(String table, Document original, Document updated) {
-        this.getDatabase().getCollection(table).replaceOne(original, updated);
+        this.getDatabase().getCollection(table).findOneAndReplace(original, updated);
     }
 
     /**
