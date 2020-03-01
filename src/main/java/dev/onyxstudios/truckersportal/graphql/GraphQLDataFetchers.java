@@ -152,7 +152,7 @@ public class GraphQLDataFetchers {
             if(authenticateToken(environment.getArgument("token")) != null) {
                 TruckersPortal.carrierProfile.name = environment.getArgument("name");
                 TruckersPortal.carrierProfile.email = environment.getArgument("email");
-                TruckersPortal.carrierProfile.phoneNumber = environment.getArgument("number");
+                TruckersPortal.carrierProfile.phoneNumber = environment.getArgument("phoneNumber");
                 TruckersPortal.carrierProfile.street = environment.getArgument("street");
                 TruckersPortal.carrierProfile.city = environment.getArgument("city");
                 TruckersPortal.carrierProfile.state = environment.getArgument("state");
