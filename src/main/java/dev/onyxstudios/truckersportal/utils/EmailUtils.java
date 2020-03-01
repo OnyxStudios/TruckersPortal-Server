@@ -13,7 +13,16 @@ public class EmailUtils {
     public static void sendRegistrationEmail(String email, String name, String password) {
         String domain = TruckersPortal.carrierProfile.domain;
         String text = "Hey " + name + ", You've been successfully registered at " + TruckersPortal.carrierProfile.name + ". You're login details are:\n\nUsername: " + email + "\nPassword: " + password + "\n\nTo login, please visit: " + (domain.contains("http") ? domain : "http://" + domain);
+        sendEmail(email, text);
+    }
 
+    public static void sendPasswordChangeEmail(String email, String name) {
+        String domain = TruckersPortal.carrierProfile.domain;
+        String text = "Hey " + name + ",\nYour password has successfully been changed. If this wasn't you contact your panel admin immediately.\n\nOtherwise to login, please visit: " + (domain.contains("http") ? domain : "http://" + domain);
+        sendEmail(email, text);
+    }
+
+    public static void sendEmail(String email, String text) {
         Properties properties = new Properties();
         properties.put("mail.smtp.host", "smtp.gmail.com");
         properties.put("mail.smtp.port", "587");

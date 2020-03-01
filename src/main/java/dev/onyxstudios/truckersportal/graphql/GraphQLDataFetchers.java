@@ -301,6 +301,46 @@ public class GraphQLDataFetchers {
         };
     }
 
+    public DataFetcher updateUserFetcher() {
+        return environment -> {
+            if(authenticateToken(environment.getArgument("token")) != null) {
+                Document user = TruckersPortal.mongoUtils.getDocument("users", new Document("id", environment.getArgument("userId")));
+                Document newData = new Document(user);
+                newData.append("firstName", environment.getArgument("firstName"));
+                newData.append("lastName", environment.getArgument("lastName"));
+                newData.append("email", environment.getArgument("email"));
+                newData.append("phoneNumber", environment.getArgument("phoneNumber"));
+
+                TruckersPortal.mongoUtils.updateDocument("users", user, newData);
+                return newData;
+            }
+
+            return null;
+        };
+    }
+
+    public DataFetcher updateUserPasswordFetcher() {
+        return environment -> {
+            if(authenticateToken(environment.getArgument("token")) != null) {
+                Document user = TruckersPortal.mongoUtils.getDocument("users", new Document("id", environment.getArgument("userId")));
+
+                if(SecurityUtils.authenticate(environment.getArgument("currentPassword").toString().toCharArray(), user.getString("password"))) {
+                    Document newData = new Document(user);
+                    newData.append("password", SecurityUtils.hash(environment.getArgument("newPassword").toString().toCharArray()));
+                    newData.append("token", SecurityUtils.generateToken());
+                    TruckersPortal.mongoUtils.updateDocument("users", user, newData);
+
+                    EmailUtils.sendPasswordChangeEmail(newData.getString("email"), newData.getString("firstName"));
+                    return newData;
+                }
+
+                return new Document("id", "INCORRECT");
+            }
+
+            return null;
+        };
+    }
+
     public DataFetcher authenticateTokenFetcher() {
         return environment -> authenticateToken(environment.getArgument("token"));
     }
