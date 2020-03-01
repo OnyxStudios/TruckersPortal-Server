@@ -18,7 +18,10 @@ public class GraphQLDataFetchers {
     public DataFetcher getLoadByIdFetcher() {
         return environment -> {
             if(authenticateToken(environment.getArgument("token")) != null) {
-                return TruckersPortal.mongoUtils.getDocument("loads", new Document("id", environment.getArgument("id")));
+                Document load = TruckersPortal.mongoUtils.getDocument("loads", new Document("id", environment.getArgument("id")));
+                load.append("driver", TruckersPortal.mongoUtils.getDocument("drivers", new Document("id", load.getString("driverId"))).getString("name"));
+
+                return load;
             }
 
             return null;
@@ -109,10 +112,8 @@ public class GraphQLDataFetchers {
                 document.append("phoneNumber", environment.getArgument("phoneNumber"));
                 document.append("permissions", environment.getArgument("permissions"));
                 document.append("password", SecurityUtils.hash(randomPassword.toCharArray()));
-                String token = SecurityUtils.generateToken();
                 document.append("token", SecurityUtils.generateToken());
 
-                TruckersPortal.mongoUtils.insertDocument("tokens", new Document("token", token));
                 TruckersPortal.mongoUtils.insertDocument("users", document);
                 EmailUtils.sendRegistrationEmail(email, firstName, randomPassword);
                 return document;
@@ -146,18 +147,6 @@ public class GraphQLDataFetchers {
         };
     }
 
-    public DataFetcher addTokenFetcher() {
-        return environment -> {
-            if(authenticateToken(environment.getArgument("token")) != null) {
-                Document document = new Document("token", environment.getArgument("newToken"));
-                TruckersPortal.mongoUtils.insertDocument("tokens", document);
-                return document;
-            }
-
-            return null;
-        };
-    }
-
     public DataFetcher updateCarrierFetcher() {
         return environment -> {
             if(authenticateToken(environment.getArgument("token")) != null) {
@@ -175,6 +164,7 @@ public class GraphQLDataFetchers {
                 TruckersPortal.carrierProfile.factoringProfile.state = environment.getArgument("factoringState");
                 TruckersPortal.carrierProfile.factoringProfile.zipCode = environment.getArgument("factoringZip");
 
+                TruckersPortal.carrierProfile.saveConfig();
                 return TruckersPortal.carrierProfile.toDocument();
             }
 
@@ -195,7 +185,16 @@ public class GraphQLDataFetchers {
     public DataFetcher getLoadsFetcher() {
         return environment -> {
             if(authenticateToken(environment.getArgument("token")) != null) {
-                return Lists.newArrayList(TruckersPortal.mongoUtils.getTableData("loads"));
+                List<Document> loads = new ArrayList<>();
+                MongoCursor<Document> cursor = TruckersPortal.mongoUtils.getTableData("loads");
+
+                while (cursor.hasNext()) {
+                    Document load = cursor.next();
+                    load.append("driver", TruckersPortal.mongoUtils.getDocument("drivers", new Document("id", load.getString("driverId"))).getString("name"));
+                    loads.add(load);
+                }
+
+                return loads;
             }
 
             return null;
@@ -307,7 +306,7 @@ public class GraphQLDataFetchers {
     }
 
     public Document authenticateToken(String token) {
-        return TruckersPortal.mongoUtils.getDocument("tokens", new Document("token", token));
+        return TruckersPortal.mongoUtils.getDocument("users", new Document("token", token));
     }
 
     public float getDriverEarnings(List<String> loads, double rawPayCut) {

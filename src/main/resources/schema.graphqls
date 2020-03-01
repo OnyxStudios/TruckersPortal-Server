@@ -19,8 +19,7 @@ type Mutation {
     addUser(token: String, firstName: String, lastName: String, email: String, phoneNumber: String, permissions: [String]): User
     changeDriverStatus(token: String, id: String, status: String): Driver
     authenticateUser(token: String, email: String, password: String): User
-    addToken(token: String, newToken: String): Token
-    authenticateToken(token: String): Token
+    authenticateToken(token: String): User
     updateCarrier(token: String, name: String, email: String, number: String, street: String, city: String, state: String, zipCode: String, factoring: Boolean, factoringName: String, factoringStreet: String, factoringCity: String, factoringState: String, factoringZip: String): Carrier
 }
 
@@ -48,17 +47,13 @@ type LoadsCount {
     loads: Int
 }
 
-type Token {
-    token: String
-}
-
 type Load {
     id: String
     brokerName: String
     loadNumber: String
     rate: Float
     detention: Float
-    driverId: String
+    driver: String
     status: String
     paid: Boolean
 }

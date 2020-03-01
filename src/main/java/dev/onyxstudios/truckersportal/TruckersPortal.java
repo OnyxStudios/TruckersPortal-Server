@@ -66,8 +66,6 @@ public class TruckersPortal {
 
     @Bean
     CommandLineRunner init(StorageService storageService) {
-        return (args) -> {
-            storageService.init();
-        };
+        return (args) -> storageService.init();
     }
 }
