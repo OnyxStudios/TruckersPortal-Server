@@ -341,6 +341,22 @@ public class GraphQLDataFetchers {
         };
     }
 
+    public DataFetcher updateLoadStatusFetcher() {
+        return environment -> {
+            if(authenticateToken(environment.getArgument("token")) != null) {
+                String loadId = environment.getArgument("loadId");
+                Document load = TruckersPortal.mongoUtils.getDocument("loads", new Document("id", loadId));
+                load.put("status", environment.getArgument("status"));
+                load.put("paid", environment.getArgument("paid"));
+
+                TruckersPortal.mongoUtils.updateDocument("loads", new Document("id", loadId), load);
+                return load;
+            }
+
+            return null;
+        };
+    }
+
     public DataFetcher authenticateTokenFetcher() {
         return environment -> authenticateToken(environment.getArgument("token"));
     }
