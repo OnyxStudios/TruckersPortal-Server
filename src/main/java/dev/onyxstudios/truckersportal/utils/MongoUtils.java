@@ -54,11 +54,11 @@ public class MongoUtils {
     /**
      * Note: Update the data selected in a table
      * @param table - The Collection to work in
-     * @param original - The original data that is written
+     * @param filter - The filter document
      * @param updated - The new data we wish to override the original data with
      */
-    public void updateDocument(String table, Document original, Document updated) {
-        this.getDatabase().getCollection(table).findOneAndReplace(original, updated);
+    public void updateDocument(String table, Document filter, Document updated) {
+        this.getDatabase().getCollection(table).replaceOne(filter, updated);
     }
 
     /**

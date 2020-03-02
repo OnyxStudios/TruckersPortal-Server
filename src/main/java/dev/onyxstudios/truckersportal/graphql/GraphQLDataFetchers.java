@@ -127,11 +127,10 @@ public class GraphQLDataFetchers {
         return environment -> {
             if(authenticateToken(environment.getArgument("token")) != null) {
                 String driverId = environment.getArgument("id");
-                Document currentData = TruckersPortal.mongoUtils.getDocument("drivers", new Document("id", driverId));
-                Document newData = new Document(currentData);
+                Document newData = TruckersPortal.mongoUtils.getDocument("drivers", new Document("id", driverId));
                 newData.append("status", environment.getArgument("status"));
 
-                TruckersPortal.mongoUtils.updateDocument("drivers", currentData, newData);
+                TruckersPortal.mongoUtils.updateDocument("drivers", new Document("id", driverId), newData);
                 return newData;
             }
 
@@ -304,14 +303,14 @@ public class GraphQLDataFetchers {
     public DataFetcher updateUserFetcher() {
         return environment -> {
             if(authenticateToken(environment.getArgument("token")) != null) {
-                Document user = TruckersPortal.mongoUtils.getDocument("users", new Document("id", environment.getArgument("userId")));
-                Document newData = new Document(user);
+                String userId = environment.getArgument("userId");
+                Document newData = TruckersPortal.mongoUtils.getDocument("users", new Document("id", userId));
                 newData.append("firstName", environment.getArgument("firstName"));
                 newData.append("lastName", environment.getArgument("lastName"));
                 newData.append("email", environment.getArgument("email"));
                 newData.append("phoneNumber", environment.getArgument("phoneNumber"));
 
-                TruckersPortal.mongoUtils.updateDocument("users", user, newData);
+                TruckersPortal.mongoUtils.updateDocument("users", new Document("id", userId), newData);
                 return newData;
             }
 
@@ -322,13 +321,14 @@ public class GraphQLDataFetchers {
     public DataFetcher updateUserPasswordFetcher() {
         return environment -> {
             if(authenticateToken(environment.getArgument("token")) != null) {
-                Document user = TruckersPortal.mongoUtils.getDocument("users", new Document("id", environment.getArgument("userId")));
+                String userId = environment.getArgument("userId");
+                Document user = TruckersPortal.mongoUtils.getDocument("users", new Document("id", userId));
 
                 if(SecurityUtils.authenticate(environment.getArgument("currentPassword").toString().toCharArray(), user.getString("password"))) {
                     Document newData = new Document(user);
                     newData.append("password", SecurityUtils.hash(environment.getArgument("newPassword").toString().toCharArray()));
                     newData.append("token", SecurityUtils.generateToken());
-                    TruckersPortal.mongoUtils.updateDocument("users", user, newData);
+                    TruckersPortal.mongoUtils.updateDocument("users", new Document("id", userId), newData);
 
                     EmailUtils.sendPasswordChangeEmail(newData.getString("email"), newData.getString("firstName"));
                     return newData;
@@ -361,16 +361,15 @@ public class GraphQLDataFetchers {
     }
 
     public void addLoadToDriver(String driverId, String loadId, String status) {
-        Document driverData = TruckersPortal.mongoUtils.getDocument("drivers", new Document("id", driverId));
-        Document newDriverData = new Document(driverData);
+        Document driver = TruckersPortal.mongoUtils.getDocument("drivers", new Document("id", driverId));
 
-        List<String> loads = (List<String>) newDriverData.get("loadsComplete");
+        List<String> loads = (List<String>) driver.get("loadsComplete");
         loads.add(loadId);
-        newDriverData.put("loadsComplete", loads);
+        driver.put("loadsComplete", loads);
         if(status.equalsIgnoreCase("in progress")) {
-            newDriverData.put("status", "Driving");
+            driver.put("status", "Driving");
         }
 
-        TruckersPortal.mongoUtils.updateDocument("drivers", driverData, newDriverData);
+        TruckersPortal.mongoUtils.updateDocument("drivers", new Document("id", driver.getString("id")), driver);
     }
 }
