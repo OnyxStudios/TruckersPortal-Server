@@ -357,6 +357,21 @@ public class GraphQLDataFetchers {
         };
     }
 
+    public DataFetcher updateDriverStatusFetcher() {
+        return environment -> {
+            if(authenticateToken(environment.getArgument("token")) != null) {
+                String driverId = environment.getArgument("driverId");
+                Document driver = TruckersPortal.mongoUtils.getDocument("drivers", new Document("id", driverId));
+                driver.put("status", environment.getArgument("status"));
+
+                TruckersPortal.mongoUtils.updateDocument("drivers", new Document("id", driverId), driver);
+                return driver;
+            }
+
+            return null;
+        };
+    }
+
     public DataFetcher authenticateTokenFetcher() {
         return environment -> authenticateToken(environment.getArgument("token"));
     }

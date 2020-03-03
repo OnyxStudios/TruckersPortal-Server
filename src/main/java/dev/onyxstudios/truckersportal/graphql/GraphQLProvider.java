@@ -67,6 +67,7 @@ public class GraphQLProvider {
                         .dataFetcher("updateUser", graphQLDataFetchers.updateUserFetcher())
                         .dataFetcher("updateUserPassword", graphQLDataFetchers.updateUserPasswordFetcher())
                         .dataFetcher("updateLoadStatus", graphQLDataFetchers.updateLoadStatusFetcher())
+                        .dataFetcher("updateDriverStatus", graphQLDataFetchers.updateDriverStatusFetcher())
                 ).build();
     }
 }
