@@ -67,7 +67,7 @@ public class GraphQLDataFetchers {
                 document.append("detention", environment.getArgument("detention"));
                 document.append("driverId", driverId);
                 document.append("status", environment.getArgument("status"));
-                document.append("paid", environment.getArgument("paid"));
+                document.append("paid", environment.getArgument("paid") != null ? environment.getArgument("paid") : false);
 
                 addLoadToDriver(driverId, loadId, status);
                 TruckersPortal.mongoUtils.insertDocument("loads", document);
@@ -235,7 +235,7 @@ public class GraphQLDataFetchers {
                 MongoCursor<Document> cursor = TruckersPortal.mongoUtils.getTableData("loads");
                 while (cursor.hasNext()) {
                     Document load = cursor.next();
-                    if (load.getBoolean("paid"))
+                    if (load.get("paid") != null && load.getBoolean("paid"))
                         revenue += load.getDouble("rate") + load.getDouble("detention");
                 }
 
@@ -253,7 +253,7 @@ public class GraphQLDataFetchers {
                 MongoCursor<Document> cursor = TruckersPortal.mongoUtils.getTableData("loads");
                 while (cursor.hasNext()) {
                     Document load = cursor.next();
-                    if (!load.getBoolean("paid"))
+                    if (load.get("paid") != null && !load.getBoolean("paid"))
                         unpaidRevenue += load.getDouble("rate") + load.getDouble("detention");
                 }
 
@@ -347,7 +347,7 @@ public class GraphQLDataFetchers {
                 String loadId = environment.getArgument("loadId");
                 Document load = TruckersPortal.mongoUtils.getDocument("loads", new Document("id", loadId));
                 load.put("status", environment.getArgument("status"));
-                load.put("paid", environment.getArgument("paid"));
+                load.put("paid", environment.getArgument("paid") != null ? environment.getArgument("paid") : false);
 
                 TruckersPortal.mongoUtils.updateDocument("loads", new Document("id", loadId), load);
                 return load;
