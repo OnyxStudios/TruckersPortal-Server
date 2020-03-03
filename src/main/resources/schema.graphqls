@@ -25,6 +25,7 @@ type Mutation {
     updateUserPassword(token: String, userId: String, currentPassword: String, newPassword: String): User
     updateLoadStatus(token: String, loadId: String, status: String, paid: Boolean): Load
     updateDriverStatus(token: String, driverId: String, status: String): Driver
+    removeUser(token: String, userId: String): Boolean
 }
 
 type Carrier {

@@ -10,6 +10,11 @@ import java.util.Properties;
 
 public class EmailUtils {
 
+    public static void sendRemovalEmail(String email, String name) {
+        String text = "Hey " + name + ", this is a notification to let you know that you have been removed from " + TruckersPortal.carrierProfile.name;
+        sendEmail(email, text, "Removal Notification");
+    }
+
     public static void sendRegistrationEmail(String email, String name, String password) {
         String domain = TruckersPortal.carrierProfile.domain;
         String text = "Hey " + name + ", You've been successfully registered at " + TruckersPortal.carrierProfile.name + ". You're login details are:\n\nUsername: " + email + "\nPassword: " + password + "\n\nTo login, please visit: " + (domain.contains("http") ? domain : "http://" + domain);

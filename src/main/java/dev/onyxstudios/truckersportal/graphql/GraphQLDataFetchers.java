@@ -372,6 +372,21 @@ public class GraphQLDataFetchers {
         };
     }
 
+    public DataFetcher removeUserFetcher() {
+        return environment -> {
+            if(authenticateToken(environment.getArgument("token")) != null) {
+                String userId = environment.getArgument("userId");
+                Document user = TruckersPortal.mongoUtils.getDocument("users", new Document("id", userId));
+
+                EmailUtils.sendRemovalEmail(user.getString("email"), user.getString("firstName"));
+                TruckersPortal.mongoUtils.deleteDocument("users", new Document("id", userId));
+                return true;
+            }
+
+            return false;
+        };
+    }
+
     public DataFetcher authenticateTokenFetcher() {
         return environment -> authenticateToken(environment.getArgument("token"));
     }
